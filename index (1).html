@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="kk" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MS Word Оқыту Платформасы</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    animation: { 'fade-in': 'fadeIn 0.4s ease-out' },
+                    keyframes: { fadeIn: { '0%': { opacity: '0', transform: 'translateY(10px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } } }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Қосымша стильдер */
+        .glass-panel { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
+    </style>
+</head>
+<body class="bg-[#F9FAFB] text-gray-900 dark:bg-[#121212] dark:text-gray-100 transition-colors duration-300 flex h-screen overflow-hidden">
+
+    <!-- Sidebar (Навигация) -->
+    <aside class="w-64 bg-white dark:bg-[#1E1E1E] border-r border-gray-200 dark:border-zinc-800 flex flex-col hidden md:flex h-full z-20">
+        <div class="p-6 border-b border-gray-200 dark:border-zinc-800">
+            <h1 class="text-xl font-bold flex items-center gap-2 cursor-pointer" onclick="renderPage('home')">
+                <i data-lucide="file-text" class="text-blue-500"></i> Word-ты Үйрен
+            </h1>
+        </div>
+        <div class="p-4">
+            <div class="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Прогресс <span id="progress-text" class="float-right">0%</span></div>
+            <div class="w-full bg-gray-200 rounded-full h-1.5 dark:bg-zinc-700 mb-6">
+                <div id="progress-bar" class="bg-blue-500 h-1.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <nav id="nav-links" class="space-y-1 custom-scrollbar overflow-y-auto h-[calc(100vh-250px)]">
+                <!-- Навигация динамикалық түрде құрылады -->
+            </nav>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col h-full relative">
+        <!-- Header -->
+        <header class="h-16 glass-panel bg-white/80 dark:bg-[#1E1E1E]/80 border-b border-gray-200 dark:border-zinc-800 flex items-center justify-between px-6 z-10 sticky top-0">
+            <button class="md:hidden p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-zinc-800" onclick="toggleMobileMenu()">
+                <i data-lucide="menu"></i>
+            </button>
+            <div id="header-title" class="font-medium text-gray-800 dark:text-gray-200">Басты бет</div>
+            <button onclick="toggleDarkMode()" class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-zinc-800 transition">
+                <i data-lucide="moon" id="theme-icon"></i>
+            </button>
+        </header>
+
+        <!-- Dynamic Content Area -->
+        <main id="app-content" class="flex-1 overflow-y-auto custom-scrollbar p-6 md:p-10 pb-24">
+            <!-- Контент осында жүктеледі -->
+        </main>
+    </div>
+
+    <!-- Мобильді мәзір (Overlay) -->
+    <div id="mobile-menu" class="fixed inset-0 bg-black/50 z-40 hidden" onclick="toggleMobileMenu()"></div>
+    <aside id="mobile-sidebar" class="fixed inset-y-0 left-0 w-64 bg-white dark:bg-[#1E1E1E] transform -translate-x-full transition-transform duration-300 z-50 flex flex-col">
+        <!-- Sidebar іші Mobile үшін қайталанады, JS арқылы басқарылады -->
+    </aside>
+
+    <script>
+        // --- ДЕРЕКТЕР БАЗАСЫ (Курс контенті) ---
+        const courseData = [
+            {
+                id: 1, title: "3.1 Microsoft Word туралы жалпы мағлұмат",
+                theory: `
+                    <h3 class="text-xl font-bold mb-3">MS Word деген не?</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Microsoft Word (қысқаша MS Word) — әлемдегі ең танымал және кеңінен қолданылатын мәтіндік процессор (word processor). Бұл бағдарлама компьютерде, планшетте немесе телефонда әртүрлі мәтіндік құжаттарды жасауға, өңдеуге, безендіруге және басып шығаруға арналған.
+MS Word Microsoft Office пакетіне кіреді және қазіргі уақытта Microsoft 365 жүйесінің құрамында жұмыс істейді. Оны мектеп оқушылары, студенттер, мұғалімдер, кеңсе қызметкерлері, жазушылар, заңгерлер, бухгалтерлер — қысқасы, құжатпен жұмыс істейтін барлық адамдар пайдаланады.
+MS Word не үшін қажет?
+MS Word-тың көмегімен сіз мыналарды жасай аласыз:
+
+Реферат, курстық және дипломдық жұмыстар
+Есептер, баяндамалар және презентацияға арналған мәтіндер
+Резюме (CV), өтініштер, өмірбаян
+Хаттар, келісімшарттар, ресми құжаттар
+Кітаптар, мақалалар, брошюралар және нұсқаулықтар
+Таблицалар, диаграммалар, суреттер және формулалар қосылған күрделі құжаттар</p>
+                    <h3 class="text-xl font-bold mb-3">Интерфейс және негізгі құралдар</h3>
+                    <ul class="list-disc pl-5 mb-4 space-y-2 text-gray-600 dark:text-gray-300">
+                        <li><strong>Таспа (Ribbon):</strong> Барлық құралдар орналасқан жоғарғы панель.</li>
+                        <li><strong>Жұмыс аймағы:</strong> Мәтін теретін ақ парақ.</li>
+                        <li><strong>Қалып-күй жолағы:</strong> Беттер саны, сөздер саны және масштаб көрсетіледі.</li>
+                    </ul>
+                    <p class="mb-4">Мәтінді пішімдеу үшін <i>Қаріп (Font)</i> және <i>Абзац (Paragraph)</i> бөлімдері жиі қолданылады.</p>
+                `,
+                video: "https://www.youtube.com/embed/xH2x9PK_yf4", // Мысал видео (Word tutorial)
+                practice: "1️⃣ Өзіңіз туралы 3 абзацтан тұратын мәтін жазыңыз. Тақырыпты Bold және Center жасаңыз.<br><br>2️⃣ Мәтінге кемінде 5 түрлі формат қолданыңыз: Italic, Underline, мәтін түсі, қаріп өлшемі, қаріп түрі.<br><br>3️⃣ Құжатқа бет нөмірін (Page Number) қосыңыз және соңына өз атыңызды оң жаққа туралап жазыңыз."
+                ,
+                quiz: [
+                    { q: "MS Word қандай бағдарлама түріне жатады?", options: ["Кестелік процессор", "Мәтіндік процессор", "Графикалық редактор"], ans: 1 },
+                    { q: "Жұмыс терезесінің ең жоғарғы жағында не орналасады?", options: ["Қалып-күй жолағы", "Тақырып жолағы (Ribbon)", "Сызғыш"], ans: 1 },
+                    { q: "Мәтінді қарайтылған (Bold) ету үшін қандай пернелер тіркесімі қолданылады?", options: ["Ctrl+I", "Ctrl+U", "Ctrl+B"], ans: 2 },
+                    { q: "Жаңа құжат құру үшін...", options: ["Ctrl+N", "Ctrl+O", "Ctrl+S"], ans: 0 },
+                    { q: "Символдарды қосу үшін қай мәзірге кіреміз?", options: ["Басты (Home)", "Кірістіру (Insert)", "Көрініс (View)"], ans: 1 }
+                ]
+            },
+            {
+                id: 2, title: "3.2 Тізімдер мен бағаналар",
+                theory: `
+                    <h3 class="text-xl font-bold mb-3">Тізімдердің түрлері</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Тізімдер — Microsoft Word-тың ең жиі қолданылатын және өте пайдалы құралдарының бірі. Олар мәтінді оқуға ыңғайлы етіп ұйымдастыруға, құжаттың көрінісін әдемі және кәсіби етуге көмектеседі.
+Word бағдарламасында тізімдердің 3 негізгі түрі бар:
+
+Маркерленген тізім (Bulleted List)
+Бұл тізімде әрбір пункт маркермен (●, ○, ■, ✓ және т.б.) белгіленеді.
+Маркерленген тізім реттілігі маңызды емес ақпаратты ұсыну үшін қолданылады.
+Мысалы:
+Азық-түліктер тізімі
+Жобаға қажетті құралдар
+Артықшылықтар мен кемшіліктер
+Кездесуге қатысушылар тізімі
+
+Нөмірленген тізім (Numbered List)
+Бұл тізімде әрбір пункт нөмірмен (1., 2., 3. немесе a), b), c) т.б.) белгіленеді.
+Нөмірленген тізім реті маңызды болған жағдайда қолданылады.
+Мысалы:
+Қадамдық нұсқаулар (рецепт, құрастыру нұсқаулығы)
+Процедуралар мен алгоритмдер
+Тексеру тізімі (Checklist)
+Заңды құжаттардағы тармақтар
+
+Көп деңгейлі тізім (Multilevel List)
+Бұл тізімнің ең күрделі және икемді түрі. Ол бірнеше деңгейден тұрады (1., 1.1., 1.1.1. немесе I., A., 1., a. т.б.).
+Көп деңгейлі тізім иерархиялық (құрылымдық) ақпаратты көрсету үшін қолданылады.
+Мысалы:
+Мазмұн кестесі
+Жоба жоспары
+Ұйымдық құрылым
+Курстық немесе дипломдық жұмыстың бөлімдері мен тармақтары
+Заң актілері мен ережелер</p>
+                    <ol class="list-decimal pl-5 mb-4 space-y-2 text-gray-600 dark:text-gray-300">
+                        <li><strong>Маркерленген (Bulleted):</strong> Реттілігі маңызды емес заттар тізімі (мысалы, азық-түлік).</li>
+                        <li><strong>Нөмірленген (Numbered):</strong> Қадамдық нұсқаулар (мысалы, рецепт).</li>
+                        <li><strong>Көп деңгейлі (Multilevel):</strong> Күрделі құрылымды құжаттар үшін.</li>
+                    </ol>
+                    <h3 class="text-xl font-bold mb-3">Бағаналар (Columns)</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Газет немесе журнал стилінде мәтін жазу үшін мәтінді бірнеше бағанаға бөлуге болады. Ол үшін <i>Макет (Layout) -> Бағаналар (Columns)</i> жолын таңдайсыз.</p>
+                `,
+                video: "https://www.youtube.com/embed/LIeGyleHjuw",
+                practice: "1️⃣ Өзіңіздің сүйікті 5 кітабыңыздың нөмірленген тізімін жасаңыз. Содан кейін парақты 2 бағанаға бөліп көріңіз. <br><br> 2️⃣ Сол тізімді нөмірленген тізімге өзгертіп, 2-деңгейлі (sub list) қосыңыз.<br><br> 3️⃣ Құжатты 2 бағанаға бөліп, әр бағанаға әртүрлі мәтін енгізіңіз және тақырып қойыңыз.",
+                quiz: [
+                    { q: "Реттілігі маңызды емес ақпаратқа қандай тізім қолданылады?", options: ["Нөмірленген", "Маркерленген", "Көп деңгейлі"], ans: 1 },
+                    { q: "Мәтінді газет стилінде бөлу үшін не қолданылады?", options: ["Кестелер", "Бағаналар (Columns)", "Бет үзілісі"], ans: 1 },
+                    { q: "Бағаналар мәзірі қай қосымшада (вкладка) орналасқан?", options: ["Басты (Home)", "Кірістіру (Insert)", "Макет (Layout)"], ans: 2 }
+                ]
+            },
+            {
+                id: 3, title: "3.3 Кестелермен жұмыс",
+                theory: `
+                    <h3 class="text-xl font-bold mb-3">Кесте құру жолдары</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Word бағдарламасында кесте құру жолдары
+
+Кесте – Microsoft Word-та ақпаратты бағандар (стовпцы) мен қатарлар (ряды) түрінде ұйымдастырудың ең тиімді тәсілі. Кестелердің көмегімен мәліметтерді салыстыруға, жүйелеуге, әдемі және оқуға ыңғайлы етіп ұсынуға болады. Кестелерді рефераттарда, курстық жұмыстарда, есептерде, күнделікті құжаттарда және кәсіби есептерде өте жиі қолданады. Кестемен жұмыс істеу мүмкіндіктері:
+
+
+
+
+
+Кестенің өлшемін өзгерту (баған мен қатар биіктігін созу немесе қысқарту)
+
+
+
+Ұяшықтарды біріктіру (Merge Cells) және бөлу (Split Cells)
+
+
+
+Кестеге түс, жиектер (Borders) және фон қою
+
+
+
+Мәтінді ұяшық ішінде туралау (орталыққа, солға, оңға)
+
+
+
+Кестеге формулалар енгізу (қарапайым есептеулер үшін)
+
+
+
+Кестенің стилін өзгерту (Table S)</p>
+                    <ul class="list-disc pl-5 mb-4 text-gray-600 dark:text-gray-300">
+                        <li>Торды (Grid) пайдаланып жылдам құру;</li>
+                        <li>"Кестені қосу" терезесінде баған/қатар санын қолмен енгізу;</li>
+                        <li>Қарындашпен кестені қолмен сызу.</li>
+                    </ul>
+                    <h3 class="text-xl font-bold mb-3">Ұяшықтармен жұмыс</h3>
+                    <p>Кесте ішіндегі ұяшықтарды <b>біріктіруге (Merge)</b> немесе <b>бөлуге (Split)</b> болады. Сонымен қатар кестенің дизайнын (түстері мен шекараларын) арнайы <i>Конструктор (Table Design)</i> бөлімінен өзгертуге болады.</p>
+                `,
+                video: "https://www.youtube.com/embed/0P5Zp4oSU-k",
+                practice: "1️⃣ 4x5 кесте құрып, әр ұяшыққа мәлімет енгізіңіз.<br><br>2️⃣ Бірнеше ұяшықты біріктіріп тақырып жасаңыз. <br><br>3️⃣ Кестеге стиль қолданыңыз: түс, border, мәтінді ортасына туралау және бір бағанды ерекше түспен белгілеңіз.",
+                quiz: [
+                    { q: "Кесте қай мәзір арқылы кірістіріледі?", options: ["Басты", "Кірістіру", "Көрініс"], ans: 1 },
+                    { q: "Екі ұяшықты бір ұяшыққа айналдыру командасы қалай аталады?", options: ["Бөлу (Split)", "Жою (Delete)", "Біріктіру (Merge)"], ans: 2 },
+                    { q: "Кесте неше өлшемнен тұрады?", options: ["Тек бағандардан", "Бағандар мен қатарлардан", "Тек қатарлардан"], ans: 1 }
+                ]
+            },
+            {
+                id: 4, title: "3.4 Формулалар енгізу",
+                theory: `
+                    <h3 class="text-xl font-bold mb-3">Теңдеулер (Equations)</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Microsoft Word бағдарламасында математикалық, физикалық, химиялық және техникалық күрделі формулаларды әдемі және дұрыс жазу үшін арнайы Теңдеу (Equation) құралы қарастырылған. Бұл құралдың көмегімен сіз қарапайым теңдеулерден бастап, өте күрделі ғылыми формулаларды да оңай және кәсіби деңгейде жаза аласыз.
+Теңдеу құралын қосу жолдары
+Теңдеу қосу үшін екі негізгі әдіс бар:
+
+Мәзір арқылы
+Жоғарғы мәзірде Кірістіру (Insert) қойындысын басыңыз.
+Теңдеу (Equation) батырмасын таңдаңыз.
+
+Пернелер тіркесімі арқылы (ең жылдам әдіс)
+Пернетақтада Alt + = (Alt пернесін басып тұрып, теңдік белгісін басу) пернелерін бірге басыңыз.
+Бұл әдіс өте ыңғайлы және көптеген пайдаланушылар осыны қолданады.
+
+
+Теңдеу қосқан кезде Word құжатта арнайы теңдеу өрісін ашады және жоғарыда Equation Tools (Теңдеу құралдары) қойындысы пайда болады.</p>
+                    <h3 class="text-xl font-bold mb-3">Құрылымдар</h3>
+                    <p class="text-gray-600 dark:text-gray-300">Теңдеу редакторындағы ең маңызды бөлім — Құрылымдар (Structures). Бұл жерде математикалық формулалардың дайын үлгілері орналасқан. Олардың көмегімен теңдеудің құрылымын тез құрып, ішіне сандар мен әріптерді жазуға болады.
+Негізгі қолданылатын құрылымдар:
+
+Бөлшектер (Fractions) — қарапайым және күрделі бөлшектер
+Индекстер (Scripts) — жоғарғы (superscript) және төменгі (subscript) индекстер
+Түбірлер (Radicals) — квадрат түбір, куб түбір және n-дәрежелі түбір
+Интегралдар (Integrals) — бірлік, қосарлы және көптік интегралдар
+Матрицалар (Matrices) — 2×2, 3×3 және үлкен өлшемді матрицалар
+Суммалар (Sums) және Өнімдер (Products)
+Шектер (Limits)
+Тригонометриялық функциялар
+Дифференциалдар және туындылар
+Грек әріптері (α, β, γ, Δ, Σ және т.б.)</p>
+                `,
+                video: "https://www.youtube.com/embed/CMv95MURldU",
+                practice: "1️⃣ Alt + = арқылы a² + b² = c² формуласын жазыңыз.<br><br>2️⃣ Бөлшек (fraction) және түбір (√) қолдана отырып күрделі формула жазыңыз.<br><br>3️⃣ Кемінде 3 түрлі құрылымды біріктіріп формула жасаңыз (индекс, түбір, бөлшек).`,",
+                quiz: [
+                    { q: "Формула енгізудің пернелер тіркесімі қандай?", options: ["Ctrl + =", "Alt + =", "Shift + F"], ans: 1 },
+                    { q: "Теңдеу құралы қай мәзірде орналасқан?", options: ["Кірістіру", "Пішім", "Сілтемелер"], ans: 0 },
+                    { q: "Бөлшек (дроби) жасау үшін қандай құрылым қолданылады?", options: ["Индекс", "Бөлшек (Fraction)", "Түбір (Radical)"], ans: 1 }
+                ]
+            },
+            {
+                id: 5, title: "3.5 Фигуралар және WordArt",
+                theory: `
+                    <h3 class="text-xl font-bold mb-3">Фигуралар (Shapes)</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Microsoft Word бағдарламасында құжатты визуалды түрде әдемі және тартымды ету үшін Фигуралар (Shapes) құралы өте жиі қолданылады. Бұл құралдың көмегімен сіз сызықтар, стрелкалар, шеңберлер, төртбұрыштар, жұлдыздар, диаграммалар және басқа да көптеген дайын пішіндерді құжатыңызға оңай қоса аласыз.
+Фигураларды қосу жолы:
+
+Жоғарғы мәзірде Кірістіру (Insert) қойындысын басыңыз.
+Фигуралар (Shapes) батырмасын таңдаңыз.
+Ашылған тізімнен қажетті пішінді (сызық, стрелка, тіктөртбұрыш, шеңбер, эллипс, жұлдыз, байланыс сызықтары және т.б.) таңдаңыз.
+Тышақтың сол жақ батырмасын басып тұрып, құжатта сүйреп отырып фигураны салыңыз.
+
+Фигураларды қолдану арқылы сіз:
+
+Процестерді, алгоритмдерді және жұмыс схемаларын көрсетуге
+Диаграммалар мен блок-схемалар жасауға
+Маңызды ақпаратты ерекшелеуге
+Құжаттың дизайнын әлдеқайда кәсіби және тартымды етуге болады.
+
+Әр фигураны жеке безендіруге болады: түсін өзгерту, контурын (жиегін) қалыңдату немесе жою, көлеңке қосу, айналдыру және мөлдірлік деңгейін реттеу.</p>
+                    <h3 class="text-xl font-bold mb-3">WordArt</h3>
+                    <p class="text-gray-600 dark:text-gray-300">WordArt — мәтінге көркемдік эффектілер беру үшін арнайы жасалған құрал. Қарапайым мәтінді әдемі, көлемді және назар аударатын етіп безендіруге мүмкіндік береді.
+WordArt қосу жолы:
+
+Кірістіру (Insert) қойындысы → WordArt батырмасын басыңыз.
+Ұсынылған стильдердің ішінен қажеттісін таңдаңыз.
+Ашылған өріске қажетті мәтінді жазыңыз.
+
+WordArt-тың негізгі мүмкіндіктері:
+
+3D эффектілер (көлемділік)
+Көлеңке (Shadow)
+Шағылысу (Reflection)
+Мәтінді қисаю (Transform) — доға, толқын, шеңбер бойымен және т.б.
+Мәтіннің түсін, градиентін және контурын өзгерту
+Мәтінге металл, пластик, шыны сияқты текстуралар беру
+
+WordArt көбінесе мына жағдайларда қолданылады:
+
+Жұмыстың мұқабасын безендіру
+Тақырыптар мен ірі жазуларды ерекшелеу
+Плакаттар, баннерлер және презентациялық материалдар жасау
+Логотип немесе айдарлар жасау</p>
+                `,
+                video: "https://www.youtube.com/embed/flabmskMzlo",
+                practice: "1️⃣ Кемінде 3 түрлі фигура салыңыз (дөңгелек, стрелка, төртбұрыш).<br><br>2️⃣ Фигураларды пайдаланып қарапайым схема (процесс) жасаңыз.<br><br>3️⃣ WordArt арқылы тақырып жазып, оған эффект (shadow немесе 3D) беріңіз.",
+                quiz: [
+                    { q: "Көркем мәтін қосу үшін қандай құрал қолданылады?", options: ["SmartArt", "WordArt", "ClipArt"], ans: 1 },
+                    { q: "Фигураларға (Shapes) не жатпайды?", options: ["Бағыттама (Стрелка)", "Кесте", "Шеңбер"], ans: 1 },
+                    { q: "Фигураның ішіне мәтін жазуға бола ма?", options: ["Иә", "Жоқ", "Тек квадрат фигураларға ғана"], ans: 0 }
+                ]
+            },
+            {
+                id: 6, title: "3.6 Диаграмма және SmartArt",
+                theory: `
+                    <h3 class="text-xl font-bold mb-3">Диаграммалар (Charts)</h3>
+                    <p class="mb-4 text-gray-600 dark:text-gray-300">Диаграммалар — сандық мәліметтерді салыстыру, талдау және визуалды түрде көрсетудің ең тиімді құралдарының бірі. Сандар мен статистикалық ақпаратты қарапайым мәтін немесе кесте түрінде көрсеткеннен гөрі, диаграмма арқылы оқырманға ақпаратты әлдеқайда жылдам және түсінікті жеткізуге болады.
+Microsoft Word-та диаграммалардың бірнеше түрі бар:
+
+Бағандық диаграмма (Column Chart)
+Жолақтық диаграмма (Bar Chart)
+Сызықтық диаграмма (Line Chart)
+Дөңгелек диаграмма (Pie Chart)
+Аумақтық диаграмма (Area Chart)
+Сеңгір тәрізді диаграмма (Scatter Chart)
+Комбинациялық диаграммалар және т.б.
+
+Диаграмма қосу жолы:
+
+Жоғарғы мәзірде Кірістіру (Insert) қойындысын басыңыз.
+Диаграмма (Chart) батырмасын таңдаңыз.
+Қажетті диаграмма түрін (мысалы, бағандық, дөңгелек немесе сызықтық) таңдаңыз.
+«ОК» батырмасын басқан кезде Word құжатта диаграмманы орналастырып, сонымен қатар шағын Excel терезесін ашады.
+Excel терезесіндегі кестеге өз мәліметтеріңізді енгізіңіз немесе өзгертіңіз. Диаграмма автоматты түрде өзгеріп отырады.</p>
+                    <h3 class="text-xl font-bold mb-3">SmartArt</h3>
+                    <p class="text-gray-600 dark:text-gray-300">SmartArt — Word-тың графикалық элементтерінің ішіндегі ең икемді және көрнекі құралдарының бірі. Ол логикалық процестерді, иерархиялық құрылымдарды, циклдерді, байланыстарды және идеялардың дамуын визуалды түрде көрсетуге арналған.
+SmartArt-тың негізгі түрлері:
+
+Иерархия (Hierarchy) – мекеме құрылымы, басқару жүйесі
+Процесс (Process) – қадамдық процестер, жұмыс алгоритмі
+Цикл (Cycle) – су айналымы, өндірістік цикл, тұрақты даму циклі
+Қатынас (Relationship) – идеялар арасындағы байланыс
+Матрица (Matrix) – 2×2, 3×3 салыстырмалы талдау
+Пирамида (Pyramid) – басымдық деңгейлері
+Суретті SmartArt – суреттермен біріктірілген нұсқалар
+
+SmartArt қосу жолы:
+
+Кірістіру (Insert) қойындысы → SmartArt батырмасын басыңыз.
+Қажетті SmartArt түрін таңдаңыз.
+Ашылған терезеде мәтінді енгізіңіз немесе өңдеңіз.
+
+SmartArt-тың артықшылықтары:
+
+Дизайны автоматты түрде кәсіби болып шығады
+Түстерін, стильдерін және орналасуын оңай өзгертуге болады
+Элементтерді қосу, жою және деңгейлерін өзгерту өте ыңғайлы
+Құжаттың жалпы стилімен үйлесімді болады</p>
+                `,
+                video: "https://www.youtube.com/embed/3Pu8O2-jclY",
+                practice: "1️⃣ Диаграмма (Chart) қосып, өз деректеріңізді енгізіңіз (мысалы: апталық шығын).<br><br>2️⃣ SmartArt арқылы 4–5 қадамнан тұратын процесс жасаңыз.<br><br>3️⃣ Диаграмманың стилін өзгертіп, түсін және дизайн параметрлерін баптаңыз.",
+                quiz: [
+                    { q: "Сандық деректерді визуализациялау үшін не қолданылады?", options: ["WordArt", "Диаграмма (Chart)", "Кесте"], ans: 1 },
+                    { q: "Иерархия мен құрылымды көрсету үшін қандай құрал қолайлы?", options: ["SmartArt", "Фигуралар", "Теңдеу"], ans: 0 },
+                    { q: "Диаграмма қосқан кезде қай бағдарламамен байланыс орнатылады?", options: ["PowerPoint", "Access", "Excel"], ans: 2 }
+                ]
+            }
+        ];
+
+        // --- STATE MANAGEMENT ---
+        let currentPage = 'home';
+        let progressData = JSON.parse(localStorage.getItem('wordCourseProgress')) || {};
+        let isDarkMode = localStorage.getItem('theme') === 'dark';
+
+        // --- INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            renderNavigation();
+            renderPage(currentPage);
+            updateProgress();
+        });
+
+        // --- ТАҚЫРЫП (THEME) ---
+        function initTheme() {
+            if (isDarkMode || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                isDarkMode = true;
+            }
+            updateThemeIcon();
+        }
+
+        function toggleDarkMode() {
+            isDarkMode = !isDarkMode;
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const icon = document.getElementById('theme-icon');
+            icon.setAttribute('data-lucide', isDarkMode ? 'sun' : 'moon');
+            lucide.createIcons();
+        }
+
+        // --- UI РЕНДЕРИНГ ---
+        function renderNavigation() {
+            const nav = document.getElementById('nav-links');
+            const mobileNav = document.createElement('div');
+            
+            let linksHTML = `
+                <button onclick="renderPage('home')" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${currentPage === 'home' ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800'}">
+                    <i data-lucide="home" class="w-5 h-5"></i>
+                    <span class="text-sm">Басты бет</span>
+                </button>
+                <div class="pt-4 pb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Модульдер</div>
+            `;
+
+            courseData.forEach((mod, index) => {
+                const isCompleted = progressData[mod.id]?.completed;
+                const isActive = currentPage === mod.id;
+                
+                linksHTML += `
+                    <button onclick="renderPage(${mod.id})" class="w-full flex items-center justify-between px-3 py-2.5 rounded-xl transition-all duration-200 text-left ${isActive ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-medium' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-zinc-800'}">
+                        <div class="flex items-center gap-3 truncate pr-2">
+                            <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${isCompleted ? 'bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-zinc-800 dark:text-gray-400'}">
+                                ${isCompleted ? '<i data-lucide="check" class="w-3.5 h-3.5"></i>' : `<span class="text-[10px]">${index + 1}</span>`}
+                            </div>
+                            <span class="text-sm truncate">${mod.title.split(' ').slice(1).join(' ')}</span>
+                        </div>
+                    </button>
+                `;
+            });
+
+            nav.innerHTML = linksHTML;
+            
+            // Populate Mobile Sidebar
+            const mobileSidebar = document.getElementById('mobile-sidebar');
+            mobileSidebar.innerHTML = `
+                <div class="p-6 border-b border-gray-200 dark:border-zinc-800 flex justify-between items-center">
+                    <h1 class="text-xl font-bold flex items-center gap-2"><i data-lucide="file-text" class="text-blue-500"></i> Word</h1>
+                    <button onclick="toggleMobileMenu()" class="p-2"><i data-lucide="x"></i></button>
+                </div>
+                <div class="p-4 flex-1 overflow-y-auto">${linksHTML}</div>
+            `;
+            lucide.createIcons();
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const sidebar = document.getElementById('mobile-sidebar');
+            menu.classList.toggle('hidden');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        }
+
+        function renderPage(pageId) {
+            currentPage = pageId;
+            const contentArea = document.getElementById('app-content');
+            const headerTitle = document.getElementById('header-title');
+            
+            renderNavigation(); // Update active states
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            if (pageId === 'home') {
+                headerTitle.innerText = "Басты бет";
+                contentArea.innerHTML = `
+                    <div class="max-w-4xl mx-auto animate-fade-in">
+                        <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 md:p-12 text-white shadow-lg mb-10 relative overflow-hidden">
+                            <div class="relative z-10">
+                                <h1 class="text-3xl md:text-5xl font-bold mb-4">MS Word-ты кәсіби меңгер</h1>
+                                <p class="text-blue-100 text-lg md:text-xl max-w-2xl mb-8">Нөлден бастап құжаттарды форматтауға дейін. Интерактивті сабақтар, бейнероликтер және практикалық тапсырмалар.</p>
+                                <button onclick="renderPage(${courseData[0].id})" class="bg-white text-blue-600 hover:bg-gray-50 font-semibold py-3 px-6 rounded-xl transition-all shadow-md flex items-center gap-2">
+                                    Оқуды бастау <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            <i data-lucide="book-open" class="absolute -bottom-10 -right-10 w-64 h-64 text-white opacity-10"></i>
+                        </div>
+
+                        <h2 class="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">Сабақтар бағдарламасы</h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${courseData.map((mod, i) => `
+                                <div onclick="renderPage(${mod.id})" class="group cursor-pointer bg-white dark:bg-[#1E1E1E] rounded-2xl p-6 border border-gray-100 dark:border-zinc-800 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                                        <i data-lucide="${i===0?'file-text':i===1?'list':i===2?'table':i===3?'sigma':i===4?'shapes':'pie-chart'}" class="w-5 h-5"></i>
+                                    </div>
+                                    <h3 class="font-bold text-lg mb-2 text-gray-800 dark:text-gray-100">${mod.title}</h3>
+                                    <div class="flex items-center gap-2 mt-4 text-sm font-medium ${progressData[mod.id]?.completed ? 'text-green-500' : 'text-gray-400'}">
+                                        ${progressData[mod.id]?.completed ? '<i data-lucide="check-circle" class="w-4 h-4"></i> Өтілді' : 'Оқуды бастау'}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                const module = courseData.find(m => m.id === pageId);
+                headerTitle.innerText = module.title;
+                const prevId = pageId > 1 ? pageId - 1 : 'home';
+                const nextId = pageId < courseData.length ? pageId + 1 : 'home';
+
+                contentArea.innerHTML = `
+                    <div class="max-w-3xl mx-auto animate-fade-in space-y-8">
+                        
+                        <!-- Theory Card -->
+                        <div class="bg-white dark:bg-[#1E1E1E] rounded-2xl p-6 md:p-8 border border-gray-100 dark:border-zinc-800 shadow-sm">
+                            <h2 class="flex items-center gap-2 text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100 border-b border-gray-100 dark:border-zinc-800 pb-4">
+                                <i data-lucide="book-open" class="text-blue-500"></i> Теория
+                            </h2>
+                            <div class="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 leading-relaxed">
+                                ${module.theory}
+                            </div>
+                        </div>
+
+                        <!-- Video Card -->
+                        <div class="bg-white dark:bg-[#1E1E1E] rounded-2xl p-6 md:p-8 border border-gray-100 dark:border-zinc-800 shadow-sm">
+                             <h2 class="flex items-center gap-2 text-xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+                                <i data-lucide="youtube" class="text-red-500"></i> Бейнесабақ
+                            </h2>
+                            <div class="aspect-video rounded-xl overflow-hidden bg-gray-100 dark:bg-zinc-800">
+                                <iframe width="100%" height="100%" src="${module.video}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                            </div>
+                        </div>
+
+                        <!-- Practice Card -->
+                        <div class="bg-blue-50 dark:bg-blue-900/10 rounded-2xl p-6 md:p-8 border border-blue-100 dark:border-blue-900/30">
+                            <h2 class="flex items-center gap-2 text-xl font-bold mb-4 text-blue-800 dark:text-blue-300">
+                                <i data-lucide="wrench"></i> Практикалық тапсырма
+                            </h2>
+                            <p class="text-blue-900 dark:text-blue-200">${module.practice}</p>
+                        </div>
+
+                        <!-- Quiz Card -->
+                        <div class="bg-white dark:bg-[#1E1E1E] rounded-2xl p-6 md:p-8 border border-gray-100 dark:border-zinc-800 shadow-sm" id="quiz-container">
+                            <h2 class="flex items-center gap-2 text-xl font-bold mb-6 text-gray-800 dark:text-gray-100">
+                                <i data-lucide="brain-circuit" class="text-purple-500"></i> Өзін-өзі тексеру (Тест)
+                            </h2>
+                            <form id="quiz-form" onsubmit="submitQuiz(event, ${module.id})">
+                                ${module.quiz.map((q, qIndex) => `
+                                    <div class="mb-6">
+                                        <p class="font-medium text-gray-800 dark:text-gray-200 mb-3">${qIndex + 1}. ${q.q}</p>
+                                        <div class="space-y-2">
+                                            ${q.options.map((opt, oIndex) => `
+                                                <label class="flex items-center p-3 rounded-lg border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 cursor-pointer transition">
+                                                    <input type="radio" name="q${qIndex}" value="${oIndex}" class="w-4 h-4 text-blue-600" required>
+                                                    <span class="ml-3 text-sm text-gray-700 dark:text-gray-300">${opt}</span>
+                                                </label>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                                <div id="quiz-result-${module.id}" class="mb-4 hidden p-4 rounded-lg font-medium text-center"></div>
+                                <button type="submit" class="w-full bg-black dark:bg-white text-white dark:text-black py-3 rounded-xl font-semibold hover:opacity-80 transition-opacity flex justify-center items-center gap-2">
+                                    <i data-lucide="check-square"></i> Тестті тапсыру
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Navigation Buttons -->
+                        <div class="flex items-center justify-between pt-6">
+                            <button onclick="renderPage(${typeof prevId === 'string' ? `'home'` : prevId})" class="flex items-center gap-2 px-5 py-2.5 rounded-lg border border-gray-200 dark:border-zinc-700 hover:bg-gray-50 dark:hover:bg-zinc-800 transition">
+                                <i data-lucide="arrow-left" class="w-4 h-4"></i> Артқа
+                            </button>
+                            <button onclick="renderPage(${typeof nextId === 'string' ? `'home'` : nextId})" class="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition shadow-sm">
+                                ${nextId === 'home' ? 'Аяқтау' : 'Келесі бөлім'} <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+
+                    </div>
+                `;
+            }
+            lucide.createIcons();
+            if(!document.getElementById('mobile-menu').classList.contains('hidden')){
+                toggleMobileMenu(); // close mobile menu on nav
+            }
+        }
+
+        // --- QUIZ & PROGRESS LOGIC ---
+        function submitQuiz(e, moduleId) {
+            e.preventDefault();
+            const module = courseData.find(m => m.id === moduleId);
+            const formData = new FormData(e.target);
+            let score = 0;
+            const total = module.quiz.length;
+
+            module.quiz.forEach((q, index) => {
+                if (parseInt(formData.get(`q${index}`)) === q.ans) {
+                    score++;
+                }
+            });
+
+            const resultDiv = document.getElementById(`quiz-result-${moduleId}`);
+            resultDiv.classList.remove('hidden', 'bg-red-50', 'text-red-600', 'bg-green-50', 'text-green-600', 'dark:bg-red-900/20', 'dark:bg-green-900/20');
+            
+            const isPassed = score === total; // Барлығы дұрыс болуы керек
+
+            if (isPassed) {
+                resultDiv.innerHTML = `Керемет! ${total}/${total} дұрыс жауап. Бөлімді сәтті аяқтадыңыз 🎉`;
+                resultDiv.classList.add('bg-green-50', 'text-green-600', 'dark:bg-green-900/20');
+                
+                // Прогрессті сақтау
+                progressData[moduleId] = { completed: true, score: score };
+                localStorage.setItem('wordCourseProgress', JSON.stringify(progressData));
+                updateProgress();
+                renderNavigation(); // Жаңарту (Check icon шығу үшін)
+            } else {
+                resultDiv.innerHTML = `Нәтиже: ${score}/${total}. Қателер бар, теорияны қайта оқып, қайта тапсырып көріңіз.`;
+                resultDiv.classList.add('bg-red-50', 'text-red-600', 'dark:bg-red-900/20');
+            }
+        }
+
+        function updateProgress() {
+            const completedCount = Object.keys(progressData).length;
+            const totalCount = courseData.length;
+            const percent = Math.round((completedCount / totalCount) * 100);
+            
+            document.getElementById('progress-bar').style.width = `${percent}%`;
+            document.getElementById('progress-text').innerText = `${percent}%`;
+        }
+    </script>
+</body>
+</html>
